@@ -27,7 +27,11 @@ def mouse_down(event):
 		x1_var.set(event.x)
 		y1_var.set(event.y)
 	elif state == 1:
-		box = (x1_var.get()*scale, y1_var.get()*scale, event.x*scale, event.y*scale)
+		box = [event.x*scale, event.y*scale, x1_var.get()*scale, y1_var.get()*scale]
+		if box[2] - box[0] < 0:
+			box[0], box[2] = box[2], box[0]
+		if box[3] - box[1] < 0:
+			box[1], box[3] = box[3], box[1]
 		ic = img.crop(box)
 		idx = img_index.get()
 		ic.save('done/' + images[idx])
@@ -36,6 +40,7 @@ def mouse_down(event):
 		if idx == len(images) - 1:
 			root.destroy()
 		else:
+			canvas.itemconfigure(rect, state=HIDDEN)
 			global p_img
 			img = Image.open('raw/' + images[idx + 1])
 			p_img = ImageTk.PhotoImage(img.resize((img.size[0]//scale, img.size[1]//scale)))
@@ -78,7 +83,7 @@ img = Image.open('raw/' + images[img_index.get()])
 resizer(root, img, canvas)
 p_img = ImageTk.PhotoImage(img.resize((img.size[0]//scale, img.size[1]//scale)))
 c_img = canvas.create_image(0, 0, anchor=NW, image=p_img)
-rect = canvas.create_line(0, 0, 0, 0, 0, 0, 0, 0, dash=(1, 1), activewidth=3, disabledwidth=0, state=HIDDEN)
+rect = canvas.create_line(0, 0, 0, 0, 0, 0, 0, 0, dash=(10, 10), activewidth=3, disabledwidth=0, state=HIDDEN)
 canvas.bind("<1>", mouse_down)
 canvas.bind('<Motion>', motion)
 root.bind('<Escape>', escape)
